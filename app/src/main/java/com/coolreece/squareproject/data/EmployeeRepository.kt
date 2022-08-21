@@ -57,11 +57,35 @@ open class EmployeeRepository(val app: Application) {
                 "Calling EmployeeService ${employeeServiceResponse.isSuccessful} Body: ${employeeServiceResponse.body()}"
             )
             Log.i("EmployeeService", "Code ${employeeServiceResponse.code()}")
-            employeeData.postValue(employeeServiceResponse.body()?.employees ?: emptyList())
+
+            val employees = employeeServiceResponse.body()?.employees ?: emptyList()
+            validateEmployee(employees)
         } else {
             Log.i("Service", "Error No Network")
         }
 
+    }
+
+    private fun validateEmployee(employees: List<Employee>) {
+        try {
+            for (employee in employees) {
+                if (employee.uuid == null) {
+                    throw Throwable()
+                } else if (employee.fullName == null) {
+                    throw Throwable()
+                } else if (employee.emailAddress == null) {
+                    throw Throwable()
+                } else if (employee.team == null) {
+                    throw Throwable()
+                } else if (employee.employeeType == null) {
+                    throw Throwable()
+                } else {
+                    employeeData.postValue(employees)
+                }
+            }
+        } catch (e: Throwable) {
+            employeeData.postValue(emptyList())
+        }
     }
 
 
