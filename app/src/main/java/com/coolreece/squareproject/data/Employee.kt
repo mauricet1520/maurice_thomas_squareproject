@@ -1,9 +1,13 @@
 package com.coolreece.squareproject.data
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+@Entity(tableName = "employees")
 data class Employee(
-    val uuid: String? = null,
+    @PrimaryKey
+    val uuid: String,
     @SerializedName("full_name")
     val fullName: String? = null,
     @SerializedName("phone_number")

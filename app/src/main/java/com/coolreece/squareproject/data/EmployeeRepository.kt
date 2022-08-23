@@ -4,15 +4,13 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData
 import com.coolreece.squareproject.util.BASE_URL
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.*
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
@@ -20,11 +18,20 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 open class EmployeeRepository(val app: Application) {
 
     val employeeData = MutableLiveData(listOf<Employee>())
+    private val employeeDao = EmployeeDatabase.getDatabase(app).employeeDao()
+
+
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
-            withTimeout(130000L) {
-                callEmployeeService()
+            val data = employeeDao.getAll()
+            if (data.isEmpty()) {
+                getEmployees()
+            } else {
+                employeeData.postValue(data)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(app, "Using local data", Toast.LENGTH_LONG).show()
+                }
             }
             Log.i("EmployeeService", "Calling EmployeeService in Repository")
         }
@@ -36,9 +43,14 @@ open class EmployeeRepository(val app: Application) {
             withTimeout(130000L) {
                 callEmployeeService()
             }
+            withContext(Dispatchers.Main) {
+                Toast.makeText(app, "Service data", Toast.LENGTH_LONG).show()
+            }
             Log.i("EmployeeService", "Calling EmployeeService in Repository")
         }
     }
+
+
 
     @WorkerThread
     suspend fun callEmployeeService() {
@@ -60,6 +72,8 @@ open class EmployeeRepository(val app: Application) {
 
             val employees = employeeServiceResponse.body()?.employees ?: emptyList()
             validateEmployee(employees)
+            employeeDao.insertEmployees(employees)
+
         } else {
             Log.i("Service", "Error No Network")
         }
