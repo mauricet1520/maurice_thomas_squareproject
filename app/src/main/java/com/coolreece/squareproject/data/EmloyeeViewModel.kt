@@ -9,6 +9,8 @@ class EmployeeViewModel(app: Application): AndroidViewModel(app) {
 
     private val employeeRepository = EmployeeRepository(app)
 
+    var selectedEmployee : Employee? = null
+
     val employeeData: LiveData<List<Employee>> = employeeRepository.employeeData
 
     fun getEmployees() {

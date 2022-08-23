@@ -1,21 +1,21 @@
 package com.coolreece.squareproject.ui.compose
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.coolreece.squareproject.R
 import com.coolreece.squareproject.data.EmployeeViewModel
 
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MainDisplay(employeeViewModel: EmployeeViewModel = viewModel()) {
+fun MainDisplay(employeeViewModel: EmployeeViewModel = viewModel(), navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -34,7 +34,7 @@ fun MainDisplay(employeeViewModel: EmployeeViewModel = viewModel()) {
             )
         },
         content = {
-            EmployeeList(employeeViewModel)
+            EmployeeList(employeeViewModel, navController, employeeViewModel)
         }
     )
 }
